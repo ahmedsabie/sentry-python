@@ -80,6 +80,12 @@ def _should_send_default_pii():
     return client.options["send_default_pii"]
 
 
+def _user_handler():
+    client = Hub.current.client
+    if not client:
+        return False
+    return client.options["user_handler"]
+
 class _InitGuard(object):
     def __init__(self, client):
         # type: (Client) -> None

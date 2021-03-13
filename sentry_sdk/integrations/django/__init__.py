@@ -6,7 +6,7 @@ import threading
 import weakref
 
 from sentry_sdk._types import MYPY
-from sentry_sdk.hub import Hub, _should_send_default_pii
+from sentry_sdk.hub import Hub, _should_send_default_pii, _user_handler
 from sentry_sdk.scope import add_global_event_processor
 from sentry_sdk.serializer import add_global_repr_processor
 from sentry_sdk.tracing import record_sql_queries
@@ -470,6 +470,14 @@ def _set_user_info(request, event):
         user_info.setdefault("username", user.get_username())
     except Exception:
         pass
+
+    user_handler = _user_handler()
+
+    if user_handler is not None:
+        try:
+            user_handler(user, user_info)
+        except Exception:
+            pass
 
 
 def install_sql_hook():
